@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: bq_data
+    schema: 'data_analysis'
+    database: tuifrance
+    tables:
+      - name: data_tui_analysis
+      - name: datamart_V_032022
+      - name: ga_data
+
+
+
+
