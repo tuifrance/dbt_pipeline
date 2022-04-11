@@ -1,0 +1,55 @@
+{{config(materiaized='table')}}
+with data as ( select *, PARSE_DATE("%Y%m%d", date ) as my_date
+ FROM {{source('bq_ga_data','ga_data_01042022')}})
+SELECT 
+count(visitId) as nbr_sessions,
+count(distinct fullVisitorId) as nbr_utilisateur,
+
+count(hits.transaction.transactionid) as nb_transaction,
+count(distinct case when trafficSource.source = 'google' then  fullVisitorId  end ) as traffic_google,
+count(distinct case when trafficSource.source = 'ecrm' then  fullVisitorId  end ) as traffic_ecrm,
+count(distinct case when trafficSource.source = '(direct)' then  fullVisitorId  end ) as traffic_direct,
+count(distinct case when trafficSource.source = ' CRITEO' then  fullVisitorId  end ) as traffic_CRITEO,
+count(distinct case when trafficSource.source = 'bing' then  fullVisitorId end ) as traffic_bing,
+count(distinct case when trafficSource.source = 'facebook'  then  fullVisitorId  end ) as traffic_facebook,
+
+count(distinct case when channelGrouping= 'SEO' then fullVisitorId end ) as SEO,
+count(distinct case when channelGrouping= 'SEA' then fullVisitorId end ) as SEA,
+count(distinct case when channelGrouping= 'Accès direct' then fullVisitorId end ) as direct,
+count(distinct case when channelGrouping= 'Référents' then fullVisitorId end ) as Referents,
+count(distinct case when channelGrouping= 'Affiliation' then fullVisitorId end ) as Affiliation,
+count(distinct case when channelGrouping= 'E-CRM' then fullVisitorId end ) as ECRM,
+count(distinct case when channelGrouping= 'Display' then fullVisitorId end ) as  Display,
+count(distinct case when channelGrouping= 'Social' then fullVisitorId end ) as Social,
+count(distinct case when channelGrouping= 'Paid Social' then fullVisitorId end ) as Paid_Social,
+count(distinct case when channelGrouping= 'Comparateur' then fullVisitorId end ) as Comparateur,
+count(distinct case when channelGrouping= '(Other)' then fullVisitorId end ) as Other,
+count(distinct case when channelGrouping= 'Google not provided' then fullVisitorId end ) as google_no_provided,
+
+sum(distinct case when channelGrouping= 'SEO' then (hits.transaction.transactionRevenue)/1000000 end ) as Revenue_SEO,
+sum(distinct case when channelGrouping= 'SEA' then (hits.transaction.transactionRevenue)/1000000  end ) as Revenue_SEA,
+sum(distinct case when channelGrouping= 'Accès direct' then (hits.transaction.transactionRevenue)/1000000  end ) as Revenue_direct,
+sum(distinct case when channelGrouping= 'Référents' then (hits.transaction.transactionRevenue)/1000000  end ) as Revenue_Referents,
+sum(distinct case when channelGrouping= 'Affiliation' then (hits.transaction.transactionRevenue)/1000000  end ) as Revenue_Affiliation,
+sum(distinct case when channelGrouping= 'E-CRM' then (hits.transaction.transactionRevenue)/1000000  end ) as Revenue_ECRM,
+sum(distinct case when channelGrouping= 'Display' then (hits.transaction.transactionRevenue)/1000000  end ) as Revenue_Display,
+sum(distinct case when channelGrouping= 'Social' then (hits.transaction.transactionRevenue)/1000000  end ) as Revenue_Social,
+sum(distinct case when channelGrouping= 'Paid Social' then (hits.transaction.transactionRevenue)/1000000  end ) as Revenue_Paid_Social,
+sum(distinct case when channelGrouping= 'Comparateur' then (hits.transaction.transactionRevenue)/1000000  end ) as Revenue_Comparateur,
+sum(distinct case when channelGrouping= '(Other)' then (hits.transaction.transactionRevenue)/1000000  end ) as Revenue_Other,
+sum(distinct case when channelGrouping= 'Google not provided' then (hits.transaction.transactionRevenue)/1000000  end ) as Revenue_google_no_provided,
+
+count(distinct case when channelGrouping= 'SEO' then hits.transaction.transactionId end ) as SEO_transaction,
+count(distinct case when channelGrouping= 'SEA' then hits.transaction.transactionId end ) as SEA_transaction,
+count(distinct case when channelGrouping= 'Accès direct' then hits.transaction.transactionId end ) as direct_transaction,
+count(distinct case when channelGrouping= 'Référents' then hits.transaction.transactionId end ) as Referents_transaction,
+count(distinct case when channelGrouping= 'Affiliation' then hits.transaction.transactionId end ) as Affiliation_transaction,
+count(distinct case when channelGrouping= 'E-CRM' then hits.transaction.transactionId end ) as ECRM_transaction,
+count(distinct case when channelGrouping= 'Display' then hits.transaction.transactionId end ) as  Display_transaction,
+count(distinct case when channelGrouping= 'Social' then hits.transaction.transactionId end ) as Social_transaction,
+count(distinct case when channelGrouping= 'Paid Social' then hits.transaction.transactionId end ) as Paid_Social_transaction,
+count(distinct case when channelGrouping= 'Comparateur' then hits.transaction.transactionId end ) as Comparateur_transaction,
+count(distinct case when channelGrouping= '(Other)' then hits.transaction.transactionId end ) as Other_transaction,
+count(distinct case when channelGrouping= 'Google not provided' then hits.transaction.transactionId end ) as google_no_provided_transaction,
+
+from data, unnest (hits) as hits
