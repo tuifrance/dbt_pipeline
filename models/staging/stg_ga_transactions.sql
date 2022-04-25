@@ -14,7 +14,7 @@ select
    h.eventInfo.eventCategory,
    h.eventInfo.eventAction,
    count(distinct CONCAT(fullVisitorId, CAST(visitStartTime AS STRING))) as sessions, 
-   h.transaction.transactionId as dossier, 
+   h.transaction.transactionId as transactions, 
    (h.transaction.transactionRevenue)/1000000 as revenue,
    (SELECT x.value FROM UNNEST(h.customDimensions) as x WHERE x.index = 29) as code_produit,
    (SELECT x.value FROM UNNEST(h.customDimensions) as x WHERE x.index = 35) as nom_produit,
