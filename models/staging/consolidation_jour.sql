@@ -29,11 +29,30 @@ FROM  {{ source('bq_data', 'datamart_V_032022') }}
 where  DateRetour >= DateDepart 
 group by date
  )
+select 
+  date, 
+  total_dossiers, 
+  clients_non_identifies, 
+  clients_identifies, 
+  Top_1_Espagne, 
+  Top_2_GRECE, 
+  Top_3_ITALIE, 
+  Top_4_MAROC, 
+  Top_5_FRANCE, 
+  Top_6_TUNISIE, 
+  Top_7_REPUBLIQUE_DOMINICAINE, 
+  Top_8_MEXIQUE, 
+  Top_9_MARTINIQUE, 
+  Top_10_CUBA, 
+  panier_moy, 
+  CA_To_prod, 
+  CA_Group_collect, 
+  CA_Franchised, 
+  CA_Internet, 
+  CA_Owned, 
+  CA_Third_party, 
+  CA_Call_center, 
+  CA_Non_renseigne 
+from 
+  data
 
-select  date,total_dossiers, clients_non_identifies,  clients_identifies,
- 
-Top_1_Espagne,Top_2_GRECE,Top_3_ITALIE,Top_4_MAROC,Top_5_FRANCE,Top_6_TUNISIE,
-Top_7_REPUBLIQUE_DOMINICAINE,Top_8_MEXIQUE,Top_9_MARTINIQUE,Top_10_CUBA,
-panier_moy,CA_To_prod,CA_Group_collect, CA_Franchised,CA_Internet,CA_Owned,
-CA_Third_party,CA_Call_center,CA_Non_renseigne
-from data
