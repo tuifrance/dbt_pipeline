@@ -5,7 +5,7 @@ format_date('%Y%m%d',date_sub(current_date(),interval 1 day)) as end_date
 )
 
 select Parse_date('%Y%m%d',date) as Date,
-count(distinct CONCAT(fullVisitorId, CAST(visitStartTime AS STRING)).visits) as sessions,
+count(distinct CONCAT(fullVisitorId, CAST(visitStartTime AS STRING))) as sessions,
 COUNT(h.transaction.transactionId) as transactions,
 sum(h.transaction.transactionRevenue) as Revenue,
 count( distinct case when h.eventInfo.eventCategory ='Fiche Produit - Zones de Clic' then CONCAT(fullVisitorId, CAST(visitStartTime AS STRING))  end ) as fich_produit,
@@ -40,7 +40,7 @@ sum(case when channelGrouping= 'Social' then h.transaction.transactionRevenue  e
 sum(case when channelGrouping= 'Paid Social' then h.transaction.transactionRevenue  end ) as paid_social_revenue,
 sum(case when channelGrouping= 'Comparateur' then h.transaction.transactionRevenue  end ) as comparateur_revenue,
 sum(case when channelGrouping= '(Other)' then h.transaction.transactionRevenue end ) as other_revenue,
-sum(case when channelGrouping= 'Google not provided' then h.transaction.transactionRevenue  end ) as not_provided_revenue 
+sum(case when channelGrouping= 'Google not provided' then h.transaction.transactionRevenue  end ) as not_provided_revenue, 
 
 count(distinct case when channelGrouping= 'SEO' then h.transaction.transactionId end ) as seo_transaction,
 count(distinct case when channelGrouping= 'SEA' then h.transaction.transactionId end ) as sea_transaction,

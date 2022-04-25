@@ -30,7 +30,7 @@ sources:
       - name: ga_sessions_*
 
   - name: cdg
-    schema: 'tuifrance'
+    schema: tuifrance
     database: tuitda-140515
     tables:
       - name: new_cdg_report
