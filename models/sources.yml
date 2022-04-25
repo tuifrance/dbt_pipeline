@@ -9,6 +9,28 @@ sources:
       - name: datamart_V_032022
       - name: ga_data
 
+  - name: bq_ga_data
+    schema: 'ga_data'
+    database: tuifrance
+    tables:
+      - name: ga_data_01042022
+      
+  - name: bq_partoo
+    schema: 'partoo_data'
+    database: tuifrance
+    tables:
+      - name: business_analytics
+      - name: presence_analytics
+      - name: review_analytics
 
+  - name: ga_tui_fr
+    schema: '105634506'
+    database: tuitda-140515
+    tables:
+      - name: ga_sessions_*
 
-
+  - name: cdg
+    schema: 'tuifrance'
+    database: tuitda-140515
+    tables:
+      - name: new_cdg_report
