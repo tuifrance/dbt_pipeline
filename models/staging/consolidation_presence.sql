@@ -10,6 +10,7 @@ with
 
  data1 as (
      select * from {{ source('bq_partoo', 'presence_analytics') }})
+     
 select 
   data1.business_id, 
   CONCAT(name, '/', city) AS store_ville, 

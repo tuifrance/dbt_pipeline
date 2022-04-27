@@ -40,8 +40,8 @@ count(distinct case when h.contentGroup.contentGroup1='TunnelStep1' and h.conten
 count(distinct case when h.contentGroup.contentGroup1='TunnelStep1' and h.contentGroup.contentGroup2= 'Step4-Error' then CONCAT(fullVisitorId, CAST(visitStartTime AS STRING)) end) as Step4_erreur,
 count( distinct case when h.eventInfo.eventCategory ='Option Package' then CONCAT(fullVisitorId, CAST(visitStartTime AS STRING))  end ) as option_package,
 count(h.transaction.transactionId ) as nb_transaction,
-sum(h.transaction.transactionRevenue ) as revenue,
-Round(SAFE_DIVIDE(sum(h.transaction.transactionRevenue ) , count(fullVisitorId)),2) as pan_moy,
+sum(h.transaction.transactionRevenue )/1000000 as revenue,
+Round(SAFE_DIVIDE(sum(h.transaction.transactionRevenue )/1000000 , count(h.transaction.transactionId)),2) as pan_moy,
 from  {{ source('ga_tui_fr', 'ga_sessions_*') }}, 
 date_range,
 unnest (hits) as h
