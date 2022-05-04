@@ -13,6 +13,7 @@ with
 select 
   data1.business_id, 
   CONCAT(name, '/', city) AS store_ville, 
+  queries_branded+queries_direct as marque_direct,
   name, 
   city, 
   address_full, 
