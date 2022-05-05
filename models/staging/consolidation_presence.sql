@@ -4,7 +4,8 @@ with
  data as(
      SELECT id, 
      name, 
-     city, 
+     city,
+     code, 
      address_full 
      FROM  {{ source('bq_partoo', 'business_analytics') }}),
 
@@ -17,6 +18,7 @@ select
   name, 
   city, 
   address_full, 
+  code,
   date, 
   queries_direct, 
   queries_indirect, 
