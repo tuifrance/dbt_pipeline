@@ -9,8 +9,8 @@
         interval 1 day
       )
     ) as end_date
-) ,
-data as ( select 
+) 
+select 
   Parse_date('%Y%m%d', date) as Date, 
   device.deviceCategory as device, 
   channelGrouping, 
@@ -36,11 +36,5 @@ where
   _table_suffix between start_date 
   and end_date 
   and h.transaction.transactionId is not null
-  )
-
-select 
- count( distinct case when type_paiement is null then dossier  end) Null_dossier,
- sum( case when type_paiement is null then revenue  end) Null_revenue,
-
-from data
+  
  
