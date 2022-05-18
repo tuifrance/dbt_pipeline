@@ -1,7 +1,7 @@
 {{ config(materialized = 'table') }}
  with date_range as (
  select 
-    '20220101' as start_date, 
+    '20211001' as start_date, 
     format_date(
       '%Y%m%d', 
       date_sub(
