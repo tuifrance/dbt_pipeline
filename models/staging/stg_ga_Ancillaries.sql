@@ -11,6 +11,7 @@ with date_range as (
     ) as end_date
 ) 
 select
+  Parse_date('%Y%m%d', date) as date, 
   p.productbrand as marque_produit,
   p.v2productname as product,
   count(h.transaction.transactionid) as Achats_uniques,
@@ -27,6 +28,6 @@ where
   and productbrand = 'Ancillaries' 
   --and p.v2productname= 'bagages supplémentaires'
 group by
- 1,2
+ 1,2,3
 order by
 revenue_produit
