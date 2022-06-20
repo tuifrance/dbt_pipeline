@@ -1,9 +1,18 @@
-{{config(materiaized='table')}}
-with date_range as (select '20220101' as start_date,
-format_date('%Y%m%d',date_sub(current_date(),interval 1 day)) as end_date
-)
+{{
+  config(
+    materialized = 'incremental',
+    labels = {'type': 'google_analytics', 'contains_pie': 'no', 'category':'production'}  
+  )
+}}
+with
+    date_range as (
+        select
+            format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
+            format_date('%Y%m%d', date_sub(current_date(), interval 1 day)) as end_date
+    ), 
 
-select Parse_date('%Y%m%d',date) as Date, 
+consolidation as
+(select Parse_date('%Y%m%d',date) as Date, 
 count(CONCAT(fullVisitorId, CAST(visitStartTime AS STRING))) as sessions,
 count(distinct fullVisitorId) as utilisateurs,
 
@@ -54,8 +63,14 @@ count(distinct case when channelGrouping= 'Comparateur' then h.transaction.trans
 count(distinct case when channelGrouping= '(Other)' then h.transaction.transactionId end ) as Other_transaction,
 count(distinct case when channelGrouping= 'Google not provided' then h.transaction.transactionId end ) as google_no_provided_transaction,
 
-From {{ source('ga_tui_fr', 'ga_sessions_*') }}, 
-date_range,
-Unnest (hits) as h
+from {{ source('ga_tui_fr', 'ga_sessions_*') }} as ga, date_range, unnest(ga.hits) as h
 where _table_suffix between start_date and end_date
 group by 1
+)
+
+
+select * from consolidation
+{% if is_incremental() %}
+where date > (select max(date) from {{ this }})
+{% endif %}
+order by date desc

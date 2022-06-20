@@ -1,14 +1,18 @@
-{{ config(materialized = 'table') }} with date_range as (
-  select 
-    '20210101' as start_date, 
-    format_date(
-      '%Y%m%d', 
-      date_sub(
-        current_date(), 
-        interval 1 day
-      )
-    ) as end_date
-) 
+{{
+  config(
+    materialized = 'incremental',
+    labels = {'type': 'google_analytics', 'contains_pie': 'no', 'category':'production'}  
+  )
+}}
+
+with
+    date_range as (
+        select
+            format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
+            format_date('%Y%m%d', date_sub(current_date(), interval 1 day)) as end_date
+    ), 
+
+consolidation as (
 select 
   Parse_date('%Y%m%d', date) as Date, 
   device.deviceCategory as device, 
@@ -25,9 +29,9 @@ select
     h.promotionActionInfo.promoIsClick
   ) AS Promotion_Clicks 
 From 
-  {{ source('ga_tui_fr', 'ga_sessions_*') }}, 
+  {{ source('ga_tui_fr', 'ga_sessions_*') }} as ga  , 
   date_range, 
-  Unnest (hits) as h, 
+  Unnest (ga.hits) as h, 
   Unnest (h.promotion) as p 
 where 
   _table_suffix between start_date 
@@ -40,4 +44,10 @@ group by
   4, 
   5, 
   6, 
-  7
+  7)
+  
+select * from consolidation
+{% if is_incremental() %}
+where date > (select max(date) from {{ this }})
+{% endif %}
+order by date desc
