@@ -1,15 +1,16 @@
-{{ config(materialized = 'table') }} 
-with date_range as (
-  select 
-    '20210101' as start_date, 
-    format_date(
-      '%Y%m%d', 
-      date_sub(
-        current_date(), 
-        interval 1 day
-      )
-    ) as end_date
-) ,
+{{
+  config(
+    materialized = 'incremental',
+    labels = {'type': 'google_analytics', 'contains_pie': 'no', 'category':'production'}  
+  )
+}}
+
+with
+    date_range as (
+        select
+            format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
+            format_date('%Y%m%d', date_sub(current_date(), interval 1 day)) as end_date
+    ), 
 data as (select distinct
    parse_date('%Y%m%d',date) as date, 
    device.deviceCategory as device,
@@ -25,12 +26,18 @@ count(distinct case when h.eventInfo.eventCategory='Fiche Produit - Zones de Cli
 count(distinct case when h.eventInfo.eventCategory='Fiche Produit - Zones de Clic' and h.eventInfo.eventAction= 'FP-calendrier' and h.eventInfo.eventLabel= 'duration'  then CONCAT(fullVisitorId, CAST(visitStartTime AS STRING)) end) as duration,
 count(distinct case when h.eventInfo.eventCategory='Fiche Produit - Zones de Clic' and h.eventInfo.eventAction= 'FP-calendrier' and h.eventInfo.eventLabel= 'goFunnel'  then CONCAT(fullVisitorId, CAST(visitStartTime AS STRING)) end) as goFunnel,
 
-from  {{ source('ga_tui_fr', 'ga_sessions_*') }},
+from  {{ source('ga_tui_fr', 'ga_sessions_*') }} as ga ,
 date_range,
 unnest (hits) as h
 where _table_suffix between start_date and end_date
-group by 1,2,3,4,5,6,7)
+group by 1,2,3,4,5,6,7),
 
-select date,device,channelGrouping,code_produit,nom_produit,destination,
+consolidation as (select date,device,channelGrouping,code_produit,nom_produit,destination,
 case when type_voyage='' then 'other' else type_voyage end as type_voyage ,consultation,voir_tarif,ville_depart,duration,goFunnel
-from data
+from data)
+
+select * from consolidation
+{% if is_incremental() %}
+where date > (select max(date) from {{ this }})
+{% endif %}
+order by date desc 

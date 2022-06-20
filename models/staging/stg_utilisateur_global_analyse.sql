@@ -1,14 +1,18 @@
-{{ config(materialized = 'table') }} with date_range as (
-  select 
-    '20220101' as start_date, 
-    format_date(
-      '%Y%m%d', 
-      date_sub(
-        current_date(), 
-        interval 1 day
-      )
-    ) as end_date
-) 
+{{
+  config(
+    materialized = 'incremental',
+    labels = {'type': 'google_analytics', 'contains_pie': 'no', 'category':'production'}  
+  )
+}}
+
+with
+    date_range as (
+        select
+            format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
+            format_date('%Y%m%d', date_sub(current_date(), interval 1 day)) as end_date
+    ), 
+
+consolidation as (
 select 
   Parse_date('%Y%m%d', date) as Date, 
   count(
@@ -204,11 +208,19 @@ select
     distinct case when channelGrouping = 'Google not provided' then h.transaction.transactionId end
   ) as not_provided_transaction 
 From 
-  {{ source('ga_tui_fr', 'ga_sessions_*') }}, 
+  {{ source('ga_tui_fr', 'ga_sessions_*') }} as ga, 
   date_range, 
-  Unnest (hits) as h 
+  Unnest (ga.hits) as h 
 where 
   _table_suffix between start_date 
   and end_date 
 group by 
-  1
+  1)
+
+
+select * from consolidation
+{% if is_incremental() %}
+where date > (select max(date) from {{ this }})
+{% endif %}
+order by date desc 
+

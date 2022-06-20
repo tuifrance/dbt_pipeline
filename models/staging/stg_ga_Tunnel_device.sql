@@ -1,14 +1,18 @@
-{{ config(materialized = 'table') }} with date_range as (
-  select 
-    '20210101' as start_date, 
-    format_date(
-      '%Y%m%d', 
-      date_sub(
-        current_date(), 
-        interval 1 day
-      )
-    ) as end_date
-) 
+{{
+  config(
+    materialized = 'incremental',
+    labels = {'type': 'google_analytics', 'contains_pie': 'no', 'category':'production'}  
+  )
+}}
+
+with
+    date_range as (
+        select
+            format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
+            format_date('%Y%m%d', date_sub(current_date(), interval 1 day)) as end_date
+    ), 
+
+consolidation as (
 select 
   Parse_date('%Y%m%d', date) as Date, 
   device.deviceCategory as device, 
@@ -254,13 +258,20 @@ select
     2
   ) as pan_moy, 
 from 
-  {{ source('ga_tui_fr', 'ga_sessions_*') }}, 
+  {{ source('ga_tui_fr', 'ga_sessions_*') }} as ga, 
   date_range, 
-  unnest (hits) as h 
+  unnest (ga.hits) as h 
 where 
   _table_suffix between start_date 
   and end_date 
 group by 
   1, 
   2, 
-  3
+  3)
+
+  select * from consolidation
+{% if is_incremental() %}
+where date > (select max(date) from {{ this }})
+{% endif %}
+order by date desc 
+
