@@ -2,15 +2,22 @@ version: 2
 
 sources:
   - name: bq_data
-    schema: 'data_analysis'
+    schema: 'tui_data_analytics'
     database: tuifrance
     tables:
-      - name: tui_data_analytics
       - name: datamart_V_032022
-      - name: ga_data
-      
+
+
+  - name: bq_data_erreur
+    schema: 'data_2021'
+    database: tuifr-221211
+    tables:
+      - name: product_data
+
+
+
   - name: bq_partoo
-    schema: 'partoo_data'
+    schema: 'Partoo'
     database: tuifrance
     tables:
       - name: business_analytics
