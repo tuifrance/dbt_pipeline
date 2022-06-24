@@ -29,7 +29,7 @@ with
     8,
     9,
     10,
-    11 ),
+    11),
   product_info AS (
   SELECT
     *
