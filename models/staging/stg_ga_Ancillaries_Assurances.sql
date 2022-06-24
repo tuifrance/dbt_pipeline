@@ -20,10 +20,9 @@ with
             p.productbrand as marque_produit,
             p.v2productname as product,
             h.transaction.transactionid as dossier,
-            count(h.transaction.transactionid) as achats_uniques,
             sum(p.productquantity) as quantite,
             sum(p.productrevenue) / 1000000 as revenue_produit,
-            Round(sum(p.productrevenue)/1000000 / sum(p.productquantity),2) as prix_moy,
+            
         from
             {{ source("ga_tui_fr", "ga_sessions_*") }} as ga,
             date_range,
@@ -34,19 +33,10 @@ with
             and h.ecommerceaction.action_type = '6'
             and h.transaction.transactionid is not null
             and productbrand = 'Ancillaries'
-            and p.v2productname  like 'suppl.golf'
-            or p.v2productname  like '%parcours de golf%'
-            or p.v2productname  like 'Supplément Golf'
-            or p.v2productname  like '%Sac de golf%'
-            or p.v2productname  like 'Spa'
-            or p.v2productname  like 'Offre Spa'
-            or p.v2productname  like 'Soin%'
-            or p.v2productname  like 'Pack VIP+- Club Lookea Ostria Resort%'
-            or p.v2productname  like 'Cure%'
-            or p.v2productname  like '%cure'
-            or p.v2productname  like 'cure%'
-        group by 1, 2, 3, 4
-        order by revenue_produit
+            and p.v2productname  like 'Assurance%'
+            or p.v2productname  like 'bagages supplémentaires'
+           
+        group by 1, 2, 3,4
     )
 
 select *
