@@ -12,8 +12,9 @@ sources:
     schema: 'data_2021'
     database: tuifr-221211
     tables:
+      - name: promotion_analysis
       - name: product_data
-
+  
 
 
   - name: bq_partoo
@@ -34,4 +35,11 @@ sources:
     schema: tuifrance
     database: tuitda-140515
     tables:
-      - name: new_cdg_report
+      - name: historic_new_cdg
+      - name: QT_032_WS_DIGITAL_DATAMART_DOSSIER_20221010
+
+  - name: crm
+    schema: tuifrance
+    database: tuitda-140515
+    tables:
+      - name: QT_032_WS_DIGITAL_DATAMART_DOSSIER_20221010
