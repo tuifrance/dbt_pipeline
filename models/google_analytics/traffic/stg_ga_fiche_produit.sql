@@ -7,9 +7,8 @@
 with
     date_range as (
         select
-            format_date(
-                '%Y%m%d', date_sub(current_date(), interval 10 day)
-            ) as start_date,
+            --'20210101' as start_date,         
+            format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
             format_date('%Y%m%d', date_sub(current_date(), interval 1 day)) as end_date
     ),
     data as (
@@ -17,27 +16,15 @@ with
             parse_date('%Y%m%d', date) as date,
             device.devicecategory as device,
             channelgrouping,
-            (
-                select x.value from unnest(h.customdimensions) as x where x.index = 29
-            ) as code_produit,
-            (
-                select x.value from unnest(h.customdimensions) as x where x.index = 119
-            ) as nom_produit,
-            (
-                select x.value from unnest(h.customdimensions) as x where x.index = 77
-            ) as destination,
-            (
-                select x.value from unnest(h.customdimensions) x where x.index = 70
-            ) as type_voyage,
-
-            count(
-                distinct case
-                    when h.eventinfo.eventcategory = 'Code Produit - Fiche Produit'
-                    then concat(fullvisitorid, cast(visitstarttime as string))
-                end
-            ) as consultation,
-            count(
-                distinct case
+            trafficsource.campaign,
+            trafficsource.medium,
+            trafficsource.source,            
+            (select x.value from unnest(h.customdimensions) as x where x.index = 29 ) as code_produit,
+            (select x.value from unnest(h.customdimensions) as x where x.index = 119) as nom_produit,
+            (select x.value from unnest(h.customdimensions) as x where x.index = 77) as destination,
+            (select x.value from unnest(h.customdimensions) x where x.index = 70) as type_voyage,
+            count(distinct case when h.eventinfo.eventcategory = 'Code Produit - Fiche Produit' then concat(fullvisitorid, cast(visitstarttime as string)) end) as consultation,
+            count( distinct case
                     when
                         h.eventinfo.eventcategory = 'Fiche Produit - Zones de Clic'
                         and h.eventinfo.eventaction = 'Voir les tarifs'
@@ -77,14 +64,16 @@ with
             date_range,
             unnest(hits) as h
         where _table_suffix between start_date and end_date
-        group by 1, 2, 3, 4, 5, 6, 7
-    ),
-
+        group by 1, 2, 3, 4, 5, 6, 7,8,9,10
+    ), 
     consolidation as (
         select
             date,
             device,
             channelgrouping,
+            campaign, 
+            source, 
+            medium,
             code_produit,
             nom_produit,
             destination,
