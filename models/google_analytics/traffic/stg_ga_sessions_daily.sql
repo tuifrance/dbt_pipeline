@@ -12,8 +12,8 @@
 with
     date_range as (
         select
-            --'20210101' as start_date,
-            format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
+            '20210101' as start_date,
+            --format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
             format_date('%Y%m%d', date_sub(current_date(), interval 1 day)) as end_date
     ), 
     consolidation as (
@@ -51,6 +51,11 @@ with
             trafficsource.campaign,
             trafficsource.medium,
             trafficsource.source,
+            trafficSource.keyword, 
+            trafficSource.adContent, 
+            trafficSource.isTrueDirect, 
+
+
             count( distinct concat(fullvisitorid, '_', visitId)) as unique_sessions, 
             count(distinct concat(fullvisitorid, cast(visitstarttime as string))) as sessions,
             count( distinct case when h.eventInfo.eventCategory = 'Utilisation Moteur HP' then concat(fullvisitorid, '_', visitId) end ) as searches,
@@ -66,7 +71,7 @@ with
         date_range, 
         unnest(ga.hits) as h
         where _table_suffix between start_date and end_date and  totals.visits = 1
-        group by 1, 2, 3, 4, 5, 6, 7
+        group by 1, 2, 3, 4, 5, 6, 7, 8,9, 10
     )
 select *
 from consolidation

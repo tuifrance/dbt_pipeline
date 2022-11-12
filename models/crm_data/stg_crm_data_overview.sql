@@ -4,7 +4,7 @@
     labels = {'type': 'crm', 'contains_pie': 'no', 'category':'production'}  
   )
 }}
-
+with info as (
 select 
   ID_EMAIL_MD5,
   NumeroDossier,
@@ -70,6 +70,20 @@ select
   NbrBebes,
   cast(REPLACE (CaBrut, ',', '.') as FLOAT64) as  CaBrut, 
   DMAJ
-from {{ source('crm', 'QT_032_WS_DIGITAL_DATAMART_DOSSIER_20221010') }}
-where ID_EMAIL_MD5 is not null 
-order by ID_EMAIL_MD5 asc , DateReservation asc 
+  from {{ source('crm', 'QT_032_WS_DIGITAL_DATAMART_DOSSIER') }}
+  where ID_EMAIL_MD5 is not null 
+  ),
+  numero_transaction as (
+  select *
+  from
+      (
+          select distinct
+              ID_EMAIL_MD5 as temp_id,
+              rank() over (partition by ID_EMAIL_MD5 order by DateReservation) numero_transaction
+          from {{ source('crm', 'QT_032_WS_DIGITAL_DATAMART_DOSSIER') }}
+      )
+)
+select * except (temp_id)
+from info a
+left join numero_transaction b on a.ID_EMAIL_MD5 = b.temp_id
+order by ID_EMAIL_MD5 asc , DateReservation asc

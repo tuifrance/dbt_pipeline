@@ -36,10 +36,9 @@ sources:
     database: tuitda-140515
     tables:
       - name: historic_new_cdg
-      - name: QT_032_WS_DIGITAL_DATAMART_DOSSIER_20221010
 
   - name: crm
     schema: tuifrance
     database: tuitda-140515
     tables:
-      - name: QT_032_WS_DIGITAL_DATAMART_DOSSIER_20221010
+      - name: QT_032_WS_DIGITAL_DATAMART_DOSSIER
