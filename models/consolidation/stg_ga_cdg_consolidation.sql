@@ -36,6 +36,7 @@ select
 select 
     data_ga.date,
     data_ga.channelgrouping, 
+    concat (data_ga.date, '_',data_ga.channelgrouping) as ligne_id, 
     data_ga.sessions, 
     data_ga.searches, 
     data_ga.transactions,

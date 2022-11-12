@@ -22,7 +22,10 @@ with
             trafficsource.medium,
             trafficsource.source,   
             trafficSource.keyword, 
-            trafficSource.adContent,                         
+            trafficSource.adContent,               
+            geoNetwork.city, 
+            geoNetwork.region, 
+            geoNetwork.country,           
             ( select x.value from unnest(h.customdimensions) x where x.index = 41) as destination,
             (select x.value from unnest(h.customdimensions) x where x.index = 33) as ville_depart,
             (select x.value from unnest(h.customdimensions) x where x.index = 22) as date_depart,
@@ -34,7 +37,7 @@ with
             _table_suffix between start_date
             and end_date
             and h.eventinfo.eventcategory = 'Utilisation Moteur HP'
-        group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13
+        group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14,15,16
   )
 
 select *
