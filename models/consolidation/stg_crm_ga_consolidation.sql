@@ -6,7 +6,6 @@
 }}
 
 with data_ga as (
-
 select 
   date,
   device,

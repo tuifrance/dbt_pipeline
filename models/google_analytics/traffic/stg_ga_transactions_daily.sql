@@ -21,7 +21,32 @@ consolidation as (
         select distinct
             parse_date('%Y%m%d', date) as date,
             device.devicecategory as device,
-            channelgrouping,
+            case
+                when trafficsource.campaign like '%BRAND%' and trafficsource.medium = 'cpc'
+                then 'SEA Brand & Hotel'
+                when trafficsource.campaign not like '%BRAND%' and trafficsource.medium = 'cpc'
+                then 'SEA Generic'
+                when trafficsource.medium = 'organic' or trafficsource.medium = 'qwant.com' or trafficsource.medium like '%yahoo.com%'
+                then 'SEO'
+                when channelgrouping = 'E-CRM'
+                then 'ECRM'
+                when channelgrouping = 'Comparateur'
+                then 'Comparateur'
+                when channelgrouping = 'Affiliation' or trafficsource.source = 'affiliation' and trafficsource.source != 'EPERFLEX'
+                then 'Affiliation'
+                when trafficsource.medium = 'retargeting' and trafficsource.source = 'CRITEO' or trafficsource.source = 'EPERFLEX'
+                then 'Retargeting Display'
+                when trafficsource.source = 'Facebookads' and trafficsource.medium in ('retargeting', 'Retargeting')
+                then 'Retargeting Social'
+                when trafficsource.medium = 'cpm' or trafficsource.campaign like '%branding%' or trafficsource.medium like '%branding%'
+                then 'Display Branding'
+                when trafficsource.source = 'Facebookads' and trafficsource.medium not in ('retargeting', 'Retargeting')
+                then 'Paid Social'
+                when channelgrouping = 'Social' and trafficsource.medium not in ('retargeting', 'Retargeting')
+                then 'Social'
+                when channelgrouping in ('Accès Direct', 'Référents') and trafficsource.source != 'qwant.com'
+                then 'Direct'
+                else 'Autre' end as channelgrouping, 
             trafficsource.campaign,
             trafficsource.medium,
             trafficsource.source,  
