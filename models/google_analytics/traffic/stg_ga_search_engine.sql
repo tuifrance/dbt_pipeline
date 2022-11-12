@@ -8,8 +8,8 @@
 with
     date_range as (
         select
-            --'20210101' as start_date,                     
-            format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
+            '20210101' as start_date,                     
+            --format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
             format_date('%Y%m%d', date_sub(current_date(), interval 1 day)) as end_date
     ) , 
 
@@ -20,7 +20,9 @@ with
             channelgrouping as channel,
             trafficsource.campaign,
             trafficsource.medium,
-            trafficsource.source,              
+            trafficsource.source,   
+            trafficSource.keyword, 
+            trafficSource.adContent,                         
             ( select x.value from unnest(h.customdimensions) x where x.index = 41) as destination,
             (select x.value from unnest(h.customdimensions) x where x.index = 33) as ville_depart,
             (select x.value from unnest(h.customdimensions) x where x.index = 22) as date_depart,
@@ -32,7 +34,7 @@ with
             _table_suffix between start_date
             and end_date
             and h.eventinfo.eventcategory = 'Utilisation Moteur HP'
-        group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11
+        group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13
   )
 
 select *

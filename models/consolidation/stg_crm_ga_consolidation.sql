@@ -100,7 +100,8 @@ data_crm as (
       NbrEnfants,
       NbrBebes,
       CaBrut, 
-      DMAJ
+      DMAJ,
+      numero_transaction
 
       from {{ ref('stg_crm_data_overview') }}
      

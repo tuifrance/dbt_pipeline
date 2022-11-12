@@ -1,6 +1,6 @@
 {{
   config(
-    materialized = 'incremental',
+    materialized = 'table',
     labels = {'type': 'google_analytics', 'contains_pie': 'no', 'category':'production'}  
   )
 }}
