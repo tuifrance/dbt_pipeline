@@ -46,3 +46,9 @@ sources:
     database: tuifrance
     tables:
       - name: funnel_data    
+
+  - name: product
+    schema: data_2021
+    database: tuifr-221211
+    tables:
+      - name: product_data          
