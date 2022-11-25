@@ -56,6 +56,12 @@ with
 select
     data_ga.date,
     data_ga.channelgrouping,
+    case 
+        when data_ga.channelgrouping in ('SEA Generic', 'SEA Brand & Hotel', 'Paid Social' , 'Affiliation', 'Comparateur') then 'PAID MEDIA'
+        when data_ga.channelgrouping in('SEO') then 'SEO'
+        when data_ga.channelgrouping in ('ECRM') then 'CRM'
+        else 'AUTRES'
+        end as  channel_grouping_grouped,
     data_ga.sessions,
     data_ga.transactions,
     round(data_ga.revenue_cdg,2) as revenue_cdg ,
