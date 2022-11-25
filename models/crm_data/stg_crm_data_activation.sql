@@ -17,7 +17,7 @@ select
     date_diff(current_date(), min(datereservation), day) as seniorite_day,
     round(date_diff(current_date(), min(datereservation), day)/365,2) as seniorite_year,
     date_diff(current_date(), max(datereservation), day) as recence_day,
-    round(date_diff(current_date(), max(datereservation), dayg )/365,2) as recence_year,
+    round(date_diff(current_date(), max(datereservation), day )/365,2) as recence_year,
     count(
         distinct case when statutreservation = 'Ferme' then numerodossier end
     ) as transactions_ferme,
