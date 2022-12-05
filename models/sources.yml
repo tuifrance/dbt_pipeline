@@ -39,7 +39,7 @@ sources:
     schema: tuifrance
     database: tuitda-140515
     tables:
-      - name: QT_032_WS_DIGITAL_DATAMART_DOSSIER20221115
+      - name: WS_DIGITAL_DATAMART_DOSSIER
 
   - name: media_data
     schema: tui_france_funnel
