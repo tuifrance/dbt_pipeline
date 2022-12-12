@@ -11,11 +11,14 @@
 with
     date_range as (
         select
+            --'20210101' as start_date, 
             format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
             format_date('%Y%m%d', date_sub(current_date(), interval 1 day)) as end_date
-    )
+    ) , 
 
-select distinct
+consolidation as (
+select 
+distinct
     date,
     visitid,
     clientid,
@@ -98,4 +101,10 @@ select distinct
 from {{ source('ga_tui_fr', 'ga_sessions_*') }} as ga, date_range, unnest(ga.hits) as h
 where _table_suffix between start_date and end_date and totals.visits = 1
 group by 1, 2, 3, 4, 5, 6
-order by revenue desc
+)
+
+select *
+
+from consolidation
+{% if is_incremental() %} where date > (select max(date) from {{ this }}) {% endif %}
+order by date desc

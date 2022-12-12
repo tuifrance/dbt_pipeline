@@ -35,6 +35,7 @@ with
             concat(date, '_', channelgrouping) as unique_id,
             sessions,
             transactions,
+            ga_revenue, 
             final_revenue as revenue_cdg,
             final_ventes as transactions_cdg,
         from {{ ref('stg_ga_cdg_consolidation') }}
@@ -74,6 +75,7 @@ select
         end as  channel_grouping_grouped,
     data_ga.sessions,
     data_ga.transactions,
+    data_ga.ga_revenue,
     round(data_ga.revenue_cdg,2) as revenue_cdg ,
     round(data_ga.transactions_cdg,2) as transactions_cdg ,
     media_data.impressions,
