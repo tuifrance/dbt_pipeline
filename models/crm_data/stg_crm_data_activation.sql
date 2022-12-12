@@ -30,13 +30,13 @@ select
     count(
         distinct case when canalregroupe != 'Internet' then numerodossier end
     ) as transactions_hors_web,
-    round(avg(nbrclients), 2) as avg_nbclients,
-    round(min(nbrclients), 2) as min_nbclients,
-    round(min(nbrclients), 2) as max_nbclients,
+    --round(avg( cast (nbrclients as int64)), 2) as avg_nbclients,
+    --round(min( cast (nbrclients as int64)), 2) as min_nbclients,
+    --round(min( cast (nbrclients as int64)), 2) as max_nbclients,
     round(avg(cabrut), 2) as avg_ca_brut,
     round(sum(cabrut), 2) as sum_ca_brut,
     round(min(cabrut), 2) as min_ca_brut,
     round(max(cabrut), 2) as max_ca_brut,
 from {{ ref('stg_crm_data_overview') }}
 group by 1
-order by transactions desc
+order by max_date_resa desc

@@ -52,3 +52,15 @@ sources:
     database: tuifr-221211
     tables:
       - name: product_data          
+
+  - name: ga_tui_fr_events
+    schema: 'analytics_315277925'
+    database: tuifr-221211
+    tables:
+      - name: ga_events_*
+
+  - name: assist_conv
+    schema: google_sheets
+    database: tuifrance
+    tables:
+      - name: Assisted_Conversions  
