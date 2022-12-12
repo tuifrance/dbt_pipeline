@@ -52,6 +52,7 @@ select
  from data_ga
  left join data_cdg
  on data_ga.date = data_cdg.Date_de_Reservation
+ order by date desc 
 
 
 

@@ -51,6 +51,16 @@ with
             clicks,
             cost
         from {{ ref('stg_media_data_consolidation') }}
+    ), 
+    assisted_conversion as ( 
+      
+        select 
+           date , 
+           channel_grouping, 
+           concat(date, '_', channel_grouping) as unique_id,
+           conversions, 
+           conversions_value
+        from {{ ref('stg_mcf_assisted_conversions_vf') }}
     )
 
 select
@@ -71,8 +81,11 @@ select
     media_data.cost,
     data_crm.total_customers,
     data_crm.old_customers,
-    data_crm.new_customers
+    data_crm.new_customers, 
+    assisted_conversion.conversions as assisted_conversions,
+    assisted_conversion.conversions_value as assisted_conversions_value,
 from data_ga
 left join data_crm on data_ga.unique_id = data_crm.unique_id
 left join media_data on data_ga.unique_id = media_data.unique_id
+left join assisted_conversion on data_ga.unique_id = assisted_conversion.unique_id
 order by data_ga.date desc

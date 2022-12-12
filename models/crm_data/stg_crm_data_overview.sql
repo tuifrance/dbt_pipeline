@@ -9,17 +9,17 @@ select
   ID_EMAIL_MD5,
   lower(email) as email,
   NumeroDossier,
-  cast(DateFinOption as date) as DateFinOption,
+  --cast( (case DateFinOption in ('nan','non') then '1990-01-01' else DateFinOption end ) as date) as DateFinOption,
   cast(DateReservation as date) as DateReservation,
   RANK() OVER ( PARTITION BY ID_EMAIL_MD5 ORDER BY DateReservation asc ) as reservation_order,
   case 
     when RANK() OVER ( PARTITION BY ID_EMAIL_MD5 ORDER BY DateReservation asc ) = 1 then 'New Customer'
     when RANK() OVER ( PARTITION BY ID_EMAIL_MD5 ORDER BY DateReservation asc ) > 1 then 'Old Customer'
     end as customer_type ,
-  cast(Date1ereConfirmation as date) as Date1ereConfirmation,
+  --cast(Date1ereConfirmation as date) as Date1ereConfirmation,
   cast(DateDepart as date) as DateDepart,
-  cast(DateRetour as date) as DateRetour,
-  cast(DateAnnulation as date) as DateAnnulation,
+  --cast(DateRetour as date) as DateRetour,
+  --cast(DateAnnulation as date) as DateAnnulation,
   statutReservation,
   TypeDossier,
   CodeAgence,
