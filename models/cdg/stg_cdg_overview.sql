@@ -1,43 +1,38 @@
 {{
-  config(
-    materialized = 'table',
-    labels = {'type': 'cdg', 'contains_pie': 'no', 'category':'production'}  
-  )
+    config(
+        materialized='table',
+        labels={'type': 'cdg', 'contains_pie': 'no', 'category': 'production'},
+    )
 }}
-     select 
-        cast(Mois_de_Reservation as date) as Mois_de_Reservation,
-        Semaine_de_Reservation,
-        Red__part_aire_Y,
-        cast(Date_de_Reservation as date) as Date_de_Reservation,
-        Numero_Dossier,
-        cast(Mois_de_Depart as date) as Mois_de_Depart, 
-        cast(Date_de_Depart as date) as Date_de_Depart,
-        Package__Y_N_,
-        Marque,
-        Groupe_Marketing_Produit,
-        Ag_ce_Consolidee_Dossier_Viaxeo,
-        Ag_ce_detaillee,
-        Point_de_V_te,
-        Code_Ville_Depart_TUSSY,
-        Pays_Destination_Consolide_Finance,
-        Destination_TO,
-        Code_Ville_Arrivee_TUSSY,
-        Code_Produit,
-        Produit,
-        Categorie_CRM_Produit,
-        Promotion__Y_N_,
-        Groupe_Duree_de_Sejour_Detail__EN_,
-        Duree_de_Sejour,
-        Dossier_A_Valoir__Y_N_,
-        A_Valoir_Genere__Y_N_,
-        Dossier_Report_Suite_Covid19__Y_N_,
-        cast(Nb_Cli_ts_Dossier_Finance as FLOAT64) as Nb_Cli_ts_Dossier_Finance,
-        cast(CA_Brut as FLOAT64 ) as CA_Brut
+select
+    cast(mois_de_reservation as date) as mois_de_reservation,
+    semaine_de_reservation,
+    red__part_aire_y,
+    cast(date_de_reservation as date) as date_de_reservation,
+    numero_dossier,
+    cast(mois_de_depart as date) as mois_de_depart,
+    cast(date_de_depart as date) as date_de_depart,
+    package__y_n_,
+    marque,
+    groupe_marketing_produit,
+    ag_ce_consolidee_dossier_viaxeo,
+    ag_ce_detaillee,
+    point_de_v_te,
+    code_ville_depart_tussy,
+    pays_destination_consolide_finance,
+    destination_to_produit,
+    code_ville_arrivee_tussy,
+    code_produit,
+    produit,
+    categorie_crm_produit,
+    promotion__y_n_,
+    groupe_duree_de_sejour_detail__en_,
+    duree_de_sejour,
+    dossier_a_valoir__y_n_,
+    a_valoir_genere__y_n_,
+    dossier_report_suite_covid19__y_n_,
+    cast(nb_cli_ts_dossier_finance as float64) as nb_cli_ts_dossier_finance,
+    cast(ca_brut as float64) as ca_brut
 
-   from {{ source('cdg', 'historic_new_cdg') }} 
-     order by Date_de_Reservation desc 
-
-
-
-
-
+from {{ source('cdg', 'historic_new_cdg') }}
+order by date_de_reservation desc
