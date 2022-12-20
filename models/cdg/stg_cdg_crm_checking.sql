@@ -57,8 +57,11 @@ with
         from {{ ref("stg_crm_data_overview") }}
     )
 
-select * except(customer_type),
-case when customer_type IS NULL then 'New Customer' else customer_type end as customer_type,
+select
+    * except (customer_type),
+    case
+        when customer_type is null then 'New Customer' else customer_type
+    end as customer_type,
 from data_cdg
 left join data_crm on data_cdg.numero_dossier = data_crm.numerodossier
 order by data_cdg.date_de_reservation desc
