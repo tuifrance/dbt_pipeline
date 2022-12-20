@@ -1,7 +1,7 @@
 {{
     config(
-        materialized='table',
-        labels={'type': 'cdg', 'contains_pie': 'no', 'category': 'production'},
+        materialized="table",
+        labels={"type": "cdg", "contains_pie": "no", "category": "production"},
     )
 }}
 
@@ -23,7 +23,7 @@ with
             point_de_v_te,
             code_ville_depart_tussy,
             pays_destination_consolide_finance,
-            destination_to,
+            destination_to_produit,
             code_ville_arrivee_tussy,
             code_produit,
             produit,
@@ -36,12 +36,11 @@ with
             dossier_report_suite_covid19__y_n_,
             nb_cli_ts_dossier_finance,
             ca_brut
-        from {{ ref('stg_cdg_overview') }}
+        from {{ ref("stg_cdg_overview") }}
     ),
     data_crm as (
 
-        select
-            distinct 
+        select distinct
             id_email_md5,
             numerodossier,
             datereservation,
@@ -55,13 +54,14 @@ with
             distributionconso,
             canaldistributionniveau1,
             codeproduit,
-        from {{ ref('stg_crm_data_overview') }}
+        from {{ ref("stg_crm_data_overview") }}
     )
 
-select 
-     * from 
-         data_cdg
-    left join data_crm
-    on data_cdg.numero_dossier = data_crm.numerodossier
-    order by data_cdg.date_de_reservation desc 
-
+select
+    * except (customer_type),
+    case
+        when customer_type is null then 'New Customer' else customer_type
+    end as customer_type,
+from data_cdg
+left join data_crm on data_cdg.numero_dossier = data_crm.numerodossier
+order by data_cdg.date_de_reservation desc
