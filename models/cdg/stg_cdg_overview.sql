@@ -32,7 +32,7 @@ select
     a_valoir_genere__y_n_,
     dossier_report_suite_covid19__y_n_,
     cast(nb_cli_ts_dossier_finance as float64) as nb_cli_ts_dossier_finance,
-    cast(ca_brut as float64) as ca_brut
+    ca_brut
 
 from {{ source('cdg', 'historic_new_cdg') }}
 order by date_de_reservation desc
