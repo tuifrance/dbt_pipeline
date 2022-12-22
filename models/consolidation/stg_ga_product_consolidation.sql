@@ -30,7 +30,7 @@ with
             concat(date_de_reservation, '_', code_produit) as unique_ligne_id,
             produit as cdg_produit,
             categorie_crm_produit as category,
-            destination_to as destination,
+            destination_to_produit as destination,
             count(distinct numero_dossier) as cdg_ventes,
             sum(nb_cli_ts_dossier_finance) as cdg_pax,
             sum(ca_brut) as cdg_revenue
