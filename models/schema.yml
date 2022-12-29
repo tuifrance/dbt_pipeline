@@ -1,0 +1,13 @@
+version: 2
+
+models:
+
+  - name: stg_cdg_crm_checking
+    description: Does some manipulation on crm data
+    columns:
+      - name: datereservation
+        description: date de départ voyage TUI
+        tests:
+          - dbt_expectations.expect_row_values_to_have_recent_data:
+              datepart: day
+              interval: 2
