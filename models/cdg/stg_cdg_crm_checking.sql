@@ -60,7 +60,7 @@ with
 select
     * except (customer_type),
     case
-        when customer_type is null then 'New Customer' else customer_type
+        when customer_type is null then 'Unknown' else customer_type
     end as customer_type,
 from data_cdg
 left join data_crm on data_cdg.numero_dossier = data_crm.numerodossier
