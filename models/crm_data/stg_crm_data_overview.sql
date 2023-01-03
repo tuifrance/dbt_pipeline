@@ -12,7 +12,8 @@ select
   --cast( (case DateFinOption in ('nan','non') then '1990-01-01' else DateFinOption end ) as date) as DateFinOption,
   cast(DateReservation as date) as DateReservation,
   RANK() OVER ( PARTITION BY ID_EMAIL_MD5 ORDER BY DateReservation asc ) as reservation_order,
-  case 
+  case
+    when ID_EMAIL_MD5 = 'nan' then 'Unknown'
     when RANK() OVER ( PARTITION BY ID_EMAIL_MD5 ORDER BY DateReservation asc ) = 1 then 'New Customer'
     when RANK() OVER ( PARTITION BY ID_EMAIL_MD5 ORDER BY DateReservation asc ) > 1 then 'Old Customer'
     end as customer_type ,
