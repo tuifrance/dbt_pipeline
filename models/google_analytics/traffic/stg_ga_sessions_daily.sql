@@ -12,8 +12,8 @@
 with
     date_range as (
         select
-
-            format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
+            '20210101' as start_date,
+            --format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
             format_date('%Y%m%d', date_sub(current_date(), interval 1 day)) as end_date
     ), 
     consolidation as (
@@ -29,21 +29,21 @@ with
                 then 'SEO'
                 when channelgrouping = 'E-CRM'
                 then 'ECRM'
-                when channelgrouping = 'Comparateur'
+                when channelgrouping = 'Comparateur' or lower(trafficSource.medium) like '%comparateur%'
                 then 'Comparateur'
-                when channelgrouping = 'Affiliation' or trafficsource.source = 'affiliation' and trafficsource.source != 'EPERFLEX'
-                then 'Affiliation'
-                when trafficsource.medium = 'retargeting' and trafficsource.source = 'CRITEO' or trafficsource.source = 'EPERFLEX'
+                when channelgrouping = 'Affiliation' or trafficsource.source = 'affiliation' and lower(trafficsource.source) != 'eperflex' or lower(trafficSource.medium) like '%mailing%'
+                then 'Affiliation' 
+                when trafficsource.medium = 'retargeting' and lower(trafficsource.source) = 'criteo' or lower(trafficsource.source) = 'eperflex' or lower(trafficsource.source)='salecycle'
                 then 'Retargeting Display'
-                when trafficsource.source = 'Facebookads' and trafficsource.medium in ('retargeting', 'Retargeting')
+                when lower(trafficsource.source) like '%facebookads%' and trafficsource.medium in ('retargeting', 'Retargeting')
                 then 'Retargeting Social'
-                when trafficsource.medium = 'cpm' or trafficsource.campaign like '%branding%' or trafficsource.medium like '%branding%'
+                when lower(trafficsource.medium) = 'cpm' or lower(trafficsource.campaign) like '%branding%' or lower(trafficsource.medium) like '%branding%'
                 then 'Display Branding'
-                when trafficsource.source = 'Facebookads' and trafficsource.medium not in ('retargeting', 'Retargeting')
+                when lower(trafficsource.source) like '%facebookads%' and lower(trafficsource.medium)  in ('branding', 'prospecting')
                 then 'Paid Social'
-                when channelgrouping = 'Social' and trafficsource.medium not in ('retargeting', 'Retargeting')
+                when channelgrouping = 'Social' and trafficsource.medium not in ('retargeting', 'Retargeting') or lower(trafficsource.source) like '%facebook%'
                 then 'Social'
-                when channelgrouping in ('Accès Direct', 'Référents') and trafficsource.source != 'qwant.com'
+                when channelgrouping in ('Accès direct', 'Référents') and trafficsource.source != 'qwant.com'
                 then 'Direct'
                 else 'Autre'
             end as customchannelgrouping,
