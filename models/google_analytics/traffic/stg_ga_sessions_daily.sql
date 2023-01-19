@@ -12,8 +12,8 @@
 with
     date_range as (
         select
-            --'20210101' as start_date,
-            format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
+            '20210101' as start_date,
+            --format_date('%Y%m%d', date_sub(current_date(), interval 10 day)) as start_date,
             format_date('%Y%m%d', date_sub(current_date(), interval 1 day)) as end_date
     ), 
     consolidation as (
@@ -37,14 +37,16 @@ with
                 then 'Retargeting Display'
                 when lower(trafficsource.source) like '%facebookads%' and trafficsource.medium in ('retargeting', 'Retargeting')
                 then 'Retargeting Social'
+                when lower(trafficsource.source) like '%facebookads%'
+                then 'Paid Social'                
                 when lower(trafficsource.medium) = 'cpm' or lower(trafficsource.campaign) like '%branding%' or lower(trafficsource.medium) like '%branding%'
                 then 'Display Branding'
-                when lower(trafficsource.source) like '%facebookads%' and lower(trafficsource.medium)  in ('branding', 'prospecting')
-                then 'Paid Social'
                 when channelgrouping = 'Social' and trafficsource.medium not in ('retargeting', 'Retargeting') or lower(trafficsource.source) like '%facebook%'
                 then 'Social'
-                when channelgrouping in ('Accès direct', 'Référents') and trafficsource.source != 'qwant.com'
+                when channelgrouping in ('Accès direct') and trafficsource.source != 'qwant.com'
                 then 'Direct'
+                when channelgrouping in ('Référents') and trafficsource.source != 'qwant.com'
+                 then 'Référents'
                 else 'Autre'
             end as customchannelgrouping,
             channelGrouping	, 
