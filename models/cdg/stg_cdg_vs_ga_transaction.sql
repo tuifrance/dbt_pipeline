@@ -17,7 +17,7 @@ with
             user_id,
             eventcategory,
             eventaction,
-            code_produit,
+            code_produit as code_produit_ga,
             code_parent_produit,
             nom_produit,
             destination,
