@@ -69,7 +69,8 @@ with
 
 select
       * , 
-      case when transactionid is null then 'FALSE' else 'TRUE' end as retrieved_status
+      case when transactionid is null then 'FALSE' else 'TRUE' end as retrieved_status, 
+      case when lower(eventcategory) like '%postbooking%' then 'PostBooking' else 'Booking' end as booking_status
       from cdg_transactions
       left join ga_transactions
       on cdg_transactions.numero_dossier = ga_transactions.transactionid
