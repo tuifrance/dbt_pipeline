@@ -65,6 +65,7 @@ with
             count( distinct case when h.eventInfo.eventCategory = 'Filtre des pages resultats' then concat(fullvisitorid, '_', visitId) end)  as search_page,
             count( distinct case when h.eventInfo.eventCategory = 'Fiche Produit - Zones de Clic' then concat(fullvisitorid, '_', visitId) end)  as product_page_clicks,
             count(distinct case when totals.bounces = 1 then concat(fullvisitorid, cast(visitstarttime as string)) end) as bounces,
+            count(distinct concat(fullvisitorid, cast(visitstarttime as string))) as users,
             count(distinct case when totals.newvisits = 1 then concat(fullvisitorid, cast(visitstarttime as string)) end) as new_users,
             count(h.transaction.transactionid) as nb_transaction,
             round(sum(h.transaction.transactionrevenue / 1000000), 2) as revenue
