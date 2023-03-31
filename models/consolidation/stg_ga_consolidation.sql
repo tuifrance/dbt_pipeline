@@ -14,6 +14,9 @@ select
       sum(product_page) as product_page, 
       sum(nb_transaction) as nb_transaction, 
       sum(revenue) as revenue, 
+      sum(users) as users,
+      sum(new_users) as new_users,
+      sum(bounces) as bounces,
     
     from {{ ref('stg_ga_sessions_daily') }}
      group by 1 , 2
@@ -27,7 +30,10 @@ select
          searches, 
          product_page, 
          nb_transaction as transactions, 
-         revenue, 
+         revenue,
+         users,
+         new_users,
+         bounces, 
         sum(sessions) over (partition by date) as g_sessions,
         SAFE_DIVIDE(sessions, sum(sessions) over (partition by date)) as poids_sessions, 
         sum(nb_transaction) over (partition by date) as g_transactions,

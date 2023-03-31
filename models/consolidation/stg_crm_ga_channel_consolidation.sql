@@ -35,9 +35,13 @@ with
             concat(date, '_', channelgrouping) as unique_id,
             sessions,
             transactions,
-            ga_revenue, 
+            ga_revenue,
+            ga_users,
+            ga_new_users,
+            ga_bounces, 
             final_revenue as revenue_cdg,
             final_ventes as transactions_cdg,
+            pax,
         from {{ ref('stg_ga_cdg_consolidation') }}
 
     ),
@@ -69,13 +73,15 @@ select
     data_ga.channelgrouping,
     case 
         when data_ga.channelgrouping in ('SEA Generic', 'SEA Brand & Hotel', 'Paid Social' , 'Affiliation', 'Comparateur') then 'PAID MEDIA'
-        when data_ga.channelgrouping in('SEO') then 'SEO'
-        when data_ga.channelgrouping in ('ECRM') then 'CRM'
-        else 'AUTRES'
-        end as  channel_grouping_grouped,
+        else 'EARN'
+        -- when data_ga.channelgrouping in('SEO') then 'SEO'
+        -- when data_ga.channelgrouping in ('ECRM') then 'CRM'
+        -- else 'AUTRES'
+    end as channel_grouping_grouped,
     data_ga.sessions,
     data_ga.transactions,
     data_ga.ga_revenue,
+    data_ga.pax,
     round(data_ga.revenue_cdg,2) as revenue_cdg ,
     round(data_ga.transactions_cdg,2) as transactions_cdg ,
     media_data.impressions,
