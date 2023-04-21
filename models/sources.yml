@@ -63,4 +63,10 @@ sources:
     schema: google_sheets
     database: tuifrance
     tables:
-      - name: Assisted_Conversions  
+      - name: Assisted_Conversions
+
+  - name: cost
+    schema: google_sheets
+    database: tuifrance
+    tables:
+      - name: cost_data_2023
