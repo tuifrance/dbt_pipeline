@@ -83,6 +83,8 @@ select
             data_ga.channelgrouping in (
                 'SEA Generic',
                 'SEA Brand & Hotel',
+                'Retargeting Display',
+                'Retargeting Social',
                 'Paid Social',
                 'Affiliation',
                 'Comparateur'
@@ -111,6 +113,7 @@ select
     assisted_conversion.conversions as assisted_conversions,
     assisted_conversion.conversions_value as assisted_conversions_value,
     gsheet_cost.cost as gsheet_cost, 
+    case when gsheet_cost.cost is not null then gsheet_cost.cost else media_data.cost end as final_cost, 
 from data_ga
 left join data_crm on data_ga.unique_id = data_crm.unique_id
 left join media_data on data_ga.unique_id = media_data.unique_id
