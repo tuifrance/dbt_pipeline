@@ -52,10 +52,9 @@ with
             date,
             channel_grouping,
             concat(date, '_', channel_grouping) as unique_id,
-            impressions,
-            clicks,
-            cost
+            sum(cost) as cost
         from {{ ref("stg_media_data_consolidation") }}
+        group by 1,2,3
     ),
     assisted_conversion as (
 
@@ -87,7 +86,8 @@ select
                 'Retargeting Social',
                 'Paid Social',
                 'Affiliation',
-                'Comparateur'
+                'Comparateur',
+                'Display Branding'
             )
         then 'PAID MEDIA'
         else 'EARN'
@@ -119,4 +119,6 @@ left join data_crm on data_ga.unique_id = data_crm.unique_id
 left join media_data on data_ga.unique_id = media_data.unique_id
 left join assisted_conversion on data_ga.unique_id = assisted_conversion.unique_id
 left join gsheet_cost on data_ga.unique_id = gsheet_cost.unique_id
+--where lower(data_ga.channelgrouping) like '%display branding%'
 order by data_ga.date desc
+
