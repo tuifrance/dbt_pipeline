@@ -9,28 +9,20 @@
     )
 }}
 
-select
-    date,
-    case
-        when data_source_type = 'doubleclicksearch' and engine like '%BRAND%'
-        then 'SEA Brand & Hotel'
-        when data_source_type = 'doubleclicksearch' and engine not like '%BRAND%'
-        then 'SEA Generic'
-        when data_source_type = 'adwords'
-        then 'SEA Generic'
-        when
-            data_source_type = 'facebookads'
-            and regexp_contains(lower(campaign), 'remarketing')
+SELECT
+  date, 
+  Data_Source_type,
+  Campaign,
+  case when data_source_type = 'doubleclicksearch' and 
+    regexp_contains(lower(Account__DoubleClick_Search),'brand|hotel') then 'SEA Brand & Hotel'
+    when data_source_type = 'facebookads' and regexp_contains(lower(campaign), 'remarketing')
         then 'Retargeting Social'
-        when
-            data_source_type = 'facebookads'
-            and lower(campaign) not like '%remarketing%'
+    when data_source_type = 'facebookads' and lower(campaign) not like '%remarketing%'
         then 'Paid Social'
         when data_source_type='criteo' then 'Retargeting Display'
-    end as channel_grouping,
-    sum(impressions) as impressions,
-    sum(clicks) as clicks,
-    round(sum(cost), 2) as cost
+     else 'SEA Generic' end channel_grouping,
+  Account__DoubleClick_Search,
+  Media_type,
+  sum(Cost) as cost
 from {{ ref("stg_funnel_global_data") }}
-group by 1, 2
-order by date desc
+group by 1,2,3,4,5,6 
