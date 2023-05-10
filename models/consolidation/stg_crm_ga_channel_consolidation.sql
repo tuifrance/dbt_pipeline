@@ -104,8 +104,6 @@ select
     data_ga.ga_new_users,
     round(data_ga.revenue_cdg, 2) as revenue_cdg,
     round(data_ga.transactions_cdg, 2) as transactions_cdg,
-    media_data.impressions,
-    media_data.clicks,
     media_data.cost,
     data_crm.total_customers,
     data_crm.old_customers,
