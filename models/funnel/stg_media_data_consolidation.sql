@@ -20,6 +20,7 @@ SELECT
     when data_source_type = 'facebookads' and lower(campaign) not like '%remarketing%'
         then 'Paid Social'
         when data_source_type='criteo' then 'Retargeting Display'
+        when data_source_type='tradetracker_api' then 'Affiliation'
      else 'SEA Generic' end channel_grouping,
   Account__DoubleClick_Search,
   Media_type,

@@ -10,6 +10,6 @@
 }}
 
 select
-*
+ *
 from {{ source('media_data', 'funnel_data') }}
 

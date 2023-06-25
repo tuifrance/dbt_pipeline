@@ -105,13 +105,14 @@ select
     round(data_ga.revenue_cdg, 2) as revenue_cdg,
     round(data_ga.transactions_cdg, 2) as transactions_cdg,
     media_data.cost,
+    gsheet_cost.cost as gsheet_cost, 
+    media_data.cost + (case when gsheet_cost.cost is null then 0 else gsheet_cost.cost end )  as final_cost,
     data_crm.total_customers,
     data_crm.old_customers,
     data_crm.new_customers,
     assisted_conversion.conversions as assisted_conversions,
     assisted_conversion.conversions_value as assisted_conversions_value,
-    gsheet_cost.cost as gsheet_cost, 
-    case when gsheet_cost.cost is not null then gsheet_cost.cost else media_data.cost end as final_cost, 
+    --case when gsheet_cost.cost is not null then gsheet_cost.cost else media_data.cost end as final_cost, 
 from data_ga
 left join data_crm on data_ga.unique_id = data_crm.unique_id
 left join media_data on data_ga.unique_id = media_data.unique_id
