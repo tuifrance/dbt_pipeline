@@ -16,7 +16,7 @@ select distinct
     --cast(Date1ereConfirmation as date) as Date1ereConfirmation,
     CODEAGENCE,
     --cast(DateRetour as date) as DateRetour,
-    --cast(DateAnnulation as date) as DateAnnulation,
+    --cast(DateAnnulation as` date) as DateAnnulation,
     AGENCE,
     CODEPOINTDEVENTE,
     POINTDEVENTE,
