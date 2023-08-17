@@ -2,116 +2,247 @@
 
 
 -- récupérer les top destination
-With data1 as (select ID_EMAIL_MD5, Destination,count(Destination) as nb
-from   {{ source('bq_data', 'datamart_V_032022') }}
-group by ID_EMAIL_MD5, Destination),
+With data1 As (
+    Select
+        id_email_md5,
+        destination,
+        count(destination) As nb
+    From {{ source('bq_data', 'datamart_V_032022') }}
+    Group By id_email_md5, destination
+),
 
-rang as (Select ID_EMAIL_MD5, Destination, nb,ROW_NUMBER() OVER(PARTITION BY ID_EMAIL_MD5 ORDER BY nb DESC) as row_number
-FROM data1
-where ID_EMAIL_MD5 is not null 
-order by ID_EMAIL_MD5),
+rang As (
+    Select
+        id_email_md5,
+        destination,
+        nb,
+        row_number()
+            Over (Partition By id_email_md5 Order By nb Desc)
+            As row_number
+    From data1
+    Where id_email_md5 Is Not Null
+    Order By id_email_md5
+),
 
-top_destination as( select ID_EMAIl_MD5, top_destination_1,top_destination_2,top_destination_3
-from (
-    select ID_EMAIL_MD5,
-case when row_number=1 then Destination end as top_destination_1,
-case when row_number=2 then Destination end as top_destination_2,
-case when row_number=3 then Destination end as top_destination_3
-from rang)),
+top_destination As (
+    Select
+        id_email_md5,
+        top_destination_1,
+        top_destination_2,
+        top_destination_3
+    From (
+        Select
+            id_email_md5,
+            Case When row_number = 1 Then destination End As top_destination_1,
+            Case When row_number = 2 Then destination End As top_destination_2,
+            Case When row_number = 3 Then destination End As top_destination_3
+        From rang
+    )
+),
 
 -- récupérer les top canal
-data2 as (select ID_EMAIL_MD5, CanalRegroupe,count(CanalRegroupe) as nb
-from   {{ source('bq_data', 'datamart_V_032022') }}
-group by ID_EMAIL_MD5, CanalRegroupe),
+data2 As (
+    Select
+        id_email_md5,
+        canalregroupe,
+        count(canalregroupe) As nb
+    From {{ source('bq_data', 'datamart_V_032022') }}
+    Group By id_email_md5, canalregroupe
+),
 
-rang1 as (Select ID_EMAIL_MD5, CanalRegroupe, nb,ROW_NUMBER() OVER(PARTITION BY ID_EMAIL_MD5 ORDER BY nb DESC) as row_number
-FROM data2
-where ID_EMAIL_MD5 is not null 
-order by ID_EMAIL_MD5),
+rang1 As (
+    Select
+        id_email_md5,
+        canalregroupe,
+        nb,
+        row_number()
+            Over (Partition By id_email_md5 Order By nb Desc)
+            As row_number
+    From data2
+    Where id_email_md5 Is Not Null
+    Order By id_email_md5
+),
 
-top_canal as( select ID_EMAIl_MD5, top_canal_1,top_canal_2,top_canal_3
-from (
-    select ID_EMAIL_MD5,
-case when row_number=1 then CanalRegroupe end as top_canal_1,
-case when row_number=2 then CanalRegroupe end as top_canal_2,
-case when row_number=3 then CanalRegroupe end as top_canal_3
-from rang1)),
+top_canal As (
+    Select
+        id_email_md5,
+        top_canal_1,
+        top_canal_2,
+        top_canal_3
+    From (
+        Select
+            id_email_md5,
+            Case When row_number = 1 Then canalregroupe End As top_canal_1,
+            Case When row_number = 2 Then canalregroupe End As top_canal_2,
+            Case When row_number = 3 Then canalregroupe End As top_canal_3
+        From rang1
+    )
+),
 
-data as (
+data As (
 
-SELECT ID_EMAIL_MD5,count( DISTINCT NumeroDossier ) as total_dossier,
-count(  case when  statutReservation = 'Ferme' then   NumeroDossier end ) as total_dossier_ferme,
-count( DISTINCT case when  statutReservation = ' Option' or  statutReservation = 'Option annulée' then   NumeroDossier end ) as total_option,
-count( DISTINCT case when  statutReservation = 'Option annulée' then   NumeroDossier end ) as total_option_annule,
-round(sum(safe_cast(CaBrut as FLOAT64)),2) as total_CA,
-count(distinct Destination) as total_destination,
-round(AVG(DATE_DIFF(cast(DateRetour as Date), cast(DateDepart as Date), day)),2) as moy_dure_sejour,  
-round(sum(DATE_DIFF(cast(DateRetour as Date), cast(DateDepart as Date), day)),2) as total_duree_sejour,
-count( distinct TypeProduit) as total_produit, 
-count( DISTINCT case when  TypeProduit = 'Sejour Balneaire' then   NumeroDossier end ) as  Sejour_Balneaire,
-count( DISTINCT case when  TypeProduit = 'Circuit' then   NumeroDossier end ) as  Circuit,
-count( DISTINCT case when  TypeProduit = 'Vols secs' then   NumeroDossier end ) as  Vols_secs,
-count( DISTINCT case when  TypeProduit = 'Sejour_Neige' then   NumeroDossier end ) as  Sejour_Neige,
-count( DISTINCT case when  TypeProduit = 'Sejour Ville' then   NumeroDossier end ) as  Sejour_Ville,
-count( DISTINCT case when  TypeProduit = 'Sejour Nature' then   NumeroDossier end ) as  Sejour_Nature,
-count( DISTINCT case when  TypeProduit = 'Autotour' then   NumeroDossier end ) as  Autotour,
-count( DISTINCT case when  TypeProduit = 'Croisiere' then   NumeroDossier end ) as   Croisiere,
-count( DISTINCT case when  statutReservation = 'ferme' then   ID_EMAIL_MD5 end ) as nbr_achat_different,
-min(DateReservation) as date_premiere_achat,
-max(DateReservation) as date_dermiere_achat,
-DATE_DIFF(current_date(),max(cast(DateReservation as Date)), DAY) AS  recence,
-DATE_DIFF(current_date(),  min(cast(DateReservation as Date)), DAY) AS  anciennete,
-round(AVG(case when  statutReservation = 'ferme' then   NbrClients end ),2) as moy_clients,
-case when sum(NbrEnfants) > 0 then 1 else 0 end  as avec_sans_enfant,
-case when count(case when Destination='France' then 1 else 0 end ) >1 then 1 else 0 end as sejour_france,
-round(AVG(DATE_DIFF(cast(DateDepart as Date),cast(DateReservation as Date), day)),2) as delai_depart,
-round(SAFE_DIVIDE(sum(safe_cast(CaBrut as FLOAT64)) , count(distinct  NumeroDossier)),2) as panier_moy,
-count(distinct case when Extract(MONTH from CAST (DateDepart AS DATE)) in (1,2) then NumeroDossier end) as dossier_Hiver,
-count(distinct case when Extract(MONTH from CAST (DateDepart AS DATE)) in (6,7) then NumeroDossier end) as dossier_Ete,
-max(safe_cast(CaBrut as FLOAT64)) as max_depense,
-min(safe_cast(CaBrut as FLOAT64)) as min_depense
-FROM {{ source('bq_data', 'datamart_V_032022') }}
-where ID_EMAIL_MD5 is not null  and DateRetour >= DateDepart
-group by ID_EMAIL_MD5)
+    Select
+        id_email_md5,
+        count(Distinct numerodossier) As total_dossier,
+        count(Case When statutreservation = 'Ferme' Then numerodossier End)
+            As total_dossier_ferme,
+        count(
+            Distinct Case
+                When
+                    statutreservation = ' Option'
+                    Or statutreservation = 'Option annulée'
+                    Then numerodossier
+            End
+        ) As total_option,
+        count(
+            Distinct Case
+                When statutreservation = 'Option annulée' Then numerodossier
+            End
+        ) As total_option_annule,
+        round(sum(safe_cast(cabrut As FLOAT64)), 2) As total_ca,
+        count(Distinct destination) As total_destination,
+        round(
+            avg(
+                date_diff(
+                    cast(dateretour As Date), cast(datedepart As Date), Day
+                )
+            ),
+            2
+        ) As moy_dure_sejour,
+        round(
+            sum(
+                date_diff(
+                    cast(dateretour As Date), cast(datedepart As Date), Day
+                )
+            ),
+            2
+        ) As total_duree_sejour,
+        count(Distinct typeproduit) As total_produit,
+        count(
+            Distinct Case
+                When typeproduit = 'Sejour Balneaire' Then numerodossier
+            End
+        ) As sejour_balneaire,
+        count(
+            Distinct Case When typeproduit = 'Circuit' Then numerodossier End
+        ) As circuit,
+        count(
+            Distinct Case When typeproduit = 'Vols secs' Then numerodossier End
+        ) As vols_secs,
+        count(
+            Distinct Case
+                When typeproduit = 'Sejour_Neige' Then numerodossier
+            End
+        ) As sejour_neige,
+        count(
+            Distinct Case
+                When typeproduit = 'Sejour Ville' Then numerodossier
+            End
+        ) As sejour_ville,
+        count(
+            Distinct Case
+                When typeproduit = 'Sejour Nature' Then numerodossier
+            End
+        ) As sejour_nature,
+        count(
+            Distinct Case When typeproduit = 'Autotour' Then numerodossier End
+        ) As autotour,
+        count(
+            Distinct Case When typeproduit = 'Croisiere' Then numerodossier End
+        ) As croisiere,
+        count(
+            Distinct Case When statutreservation = 'ferme' Then id_email_md5 End
+        ) As nbr_achat_different,
+        min(datereservation) As date_premiere_achat,
+        max(datereservation) As date_dermiere_achat,
+        date_diff(current_date(), max(cast(datereservation As Date)), Day)
+            As recence,
+        date_diff(current_date(), min(cast(datereservation As Date)), Day)
+            As anciennete,
+        round(
+            avg(Case When statutreservation = 'ferme' Then nbrclients End), 2
+        ) As moy_clients,
+        Case When sum(nbrenfants) > 0 Then 1 Else 0 End As avec_sans_enfant,
+        Case
+            When
+                count(Case When destination = 'France' Then 1 Else 0 End) > 1
+                Then 1
+            Else 0
+        End As sejour_france,
+        round(
+            avg(
+                date_diff(
+                    cast(datedepart As Date), cast(datereservation As Date), Day
+                )
+            ),
+            2
+        ) As delai_depart,
+        round(
+            safe_divide(
+                sum(safe_cast(cabrut As FLOAT64)), count(Distinct numerodossier)
+            ),
+            2
+        ) As panier_moy,
+        count(
+            Distinct Case
+                When
+                    extract(Month From cast(datedepart As DATE)) In (1, 2)
+                    Then numerodossier
+            End
+        ) As dossier_hiver,
+        count(
+            Distinct Case
+                When
+                    extract(Month From cast(datedepart As DATE)) In (6, 7)
+                    Then numerodossier
+            End
+        ) As dossier_ete,
+        max(safe_cast(cabrut As FLOAT64)) As max_depense,
+        min(safe_cast(cabrut As FLOAT64)) As min_depense
+    From {{ source('bq_data', 'datamart_V_032022') }}
+    Where id_email_md5 Is Not Null And dateretour >= datedepart
+    Group By id_email_md5
+)
 
-select data.ID_EMAIl_MD5,
-total_dossier,
-total_dossier ferme,
-total_option,
-total_option_annule,
-total_CA,
-total_destination,
-moy_dure_sejour,
-total_produit,
-Sejour_Balneaire,
-Circuit,
-Vols_secs,
-Sejour_Neige,
-Sejour_Ville,
-Sejour_Nature,
-Autotour,
-Croisiere,
-nbr_achat_different,
-date_premiere_achat,
-date_dermiere_achat,
-recence,
-anciennete,
-moy_clients,
-avec_sans_enfant,
-top_destination_1,
-top_destination_2,
-top_destination_3,
-top_canal_1,
-top_canal_2,
-top_canal_3,
-sejour_france,
-delai_depart,
-panier_moy,
-dossier_Hiver,
-dossier_Ete,
-max_depense,
-min_depense
-from data 
-left join top_destination as t1 on data.ID_EMAIl_MD5=t1.ID_EMAIl_MD5
-left join top_canal as t2 on data.ID_EMAIl_MD5=t2.ID_EMAIl_MD5
-order by data.ID_EMAIl_MD5
+Select
+    data.id_email_md5,
+    total_dossier,
+    total_dossier As ferme,
+    total_option,
+    total_option_annule,
+    total_ca,
+    total_destination,
+    moy_dure_sejour,
+    total_produit,
+    sejour_balneaire,
+    circuit,
+    vols_secs,
+    sejour_neige,
+    sejour_ville,
+    sejour_nature,
+    autotour,
+    croisiere,
+    nbr_achat_different,
+    date_premiere_achat,
+    date_dermiere_achat,
+    recence,
+    anciennete,
+    moy_clients,
+    avec_sans_enfant,
+    top_destination_1,
+    top_destination_2,
+    top_destination_3,
+    top_canal_1,
+    top_canal_2,
+    top_canal_3,
+    sejour_france,
+    delai_depart,
+    panier_moy,
+    dossier_hiver,
+    dossier_ete,
+    max_depense,
+    min_depense
+From data
+Left Join top_destination As t1 On data.id_email_md5 = t1.id_email_md5
+Left Join top_canal As t2 On data.id_email_md5 = t2.id_email_md5
+Order By data.id_email_md5
