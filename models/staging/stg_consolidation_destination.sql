@@ -1,75 +1,219 @@
 {{ config(materialized='table') }}
-with data as (select Destination,
-count(DISTINCT case when  statutReservation = 'Ferme' then   NumeroDossier end ) as total_dossier_ferme,
-count( DISTINCT case when  CanalRegroupe = 'TO Prod.' then   NumeroDossier end ) as To_prod,
-count( DISTINCT case when  CanalRegroupe = ' Group & Collect.' then   NumeroDossier end ) as Group_collect,
-count( DISTINCT case when  CanalRegroupe = 'Franchised' then   NumeroDossier end ) as Franchised,
-count( DISTINCT case when  CanalRegroupe = 'Internet' then   NumeroDossier end ) as Internet,
-count( DISTINCT case when  CanalRegroupe = 'Owned' then   NumeroDossier end ) as Owned,
-count( DISTINCT case when  CanalRegroupe = 'Third Party' then   NumeroDossier end ) as Third_party, 
-count( DISTINCT case when  CanalRegroupe = 'Call Center' then   NumeroDossier end ) as Call_center,
-count( DISTINCT case when  CanalRegroupe = 'Non Renseigné' then   NumeroDossier end ) as Non_renseigne,
-count( DISTINCT case when  ID_EMAIL_MD5 is null then   NumeroDossier end ) as clients_non_identifies, 
-count( DISTINCT case when  ID_EMAIL_MD5 is not null  then   NumeroDossier end ) as clients_identifies,
-round(SAFE_DIVIDE(sum(safe_cast(CaBrut as FLOAT64)) , count(distinct  NumeroDossier)),2) as panier_moy,
-round(AVG(DATE_DIFF(cast(DateDepart as Date),cast(DateReservation as Date), day)),2) as delai_achat,
-round(AVG(DATE_DIFF(cast(DateRetour as Date), cast(DateDepart as Date), day)),2) as moy_dure_sejour,  
-count( DISTINCT case when  TypeProduit = 'Sejour Balneaire' then   NumeroDossier end ) as  Sejour_Balneaire,
-count( DISTINCT case when  TypeProduit = 'Circuit' then   NumeroDossier end ) as  Circuit,
-count( DISTINCT case when  TypeProduit = 'Vols secs' then   NumeroDossier end ) as  Vols_secs,
-count( DISTINCT case when  TypeProduit = 'Sejour_Neige' then   NumeroDossier end ) as  Sejour_Neige,
-count( DISTINCT case when  TypeProduit = 'Sejour Ville' then   NumeroDossier end ) as  Sejour_Ville,
-count( DISTINCT case when  TypeProduit = 'Sejour Nature' then   NumeroDossier end ) as  Sejour_Nature,
-count( DISTINCT case when  TypeProduit = 'Autotour' then   NumeroDossier end ) as  Autotour,
-count( DISTINCT case when  TypeProduit = 'Croisiere' then   NumeroDossier end ) as   Croisiere,
-round(AVG( NbrClients ),2) as pax_moy,
-round(sum(NbrAdultes) / sum(case when NbrEnfants >0 then NbrEnfants end),2) as ratio_Adultes_enfants,
-count( DISTINCT case when  GroupeMarketingCircuit = 'Decouvrir' then   NumeroDossier end ) as Decourir,
-count( DISTINCT case when  GroupeMarketingCircuit = 'CONNAISSEUR' then   NumeroDossier end ) as CONNAISSEUR,
-count( DISTINCT case when  GroupeMarketingCircuit = 'APPROFONDIR' then   NumeroDossier end ) as APPROFONDIR,
-count( DISTINCT case when  GroupeMarketingCircuit = 'ESSENTIEL' then   NumeroDossier end ) as ESSENTIEl,
-count( DISTINCT case when  GroupeMarketingCircuit = 'Séjours Activités' then   NumeroDossier end ) as Sejours_Activites,
-count( DISTINCT case when  GroupeMarketingCircuit = 'GRANDEUR NATURE' then   NumeroDossier end ) as GRANDEUR_NATURE,
-count( DISTINCT case when  GroupeMarketingCircuit = 'RENCONTRER' then   NumeroDossier end ) as RENCONTRER,
-count( DISTINCT case when  GroupeMarketingCircuit = 'ESTHETE' then   NumeroDossier end ) as ESTHETE,
-count( DISTINCT case when  GroupeMarketingCircuit = 'HOTELS AUTRES' then   NumeroDossier end ) as HOTELS_Autres,
-count( DISTINCT case when  GroupeMarketingCircuit = 'Lookéa' then   NumeroDossier end ) as Lookea,
-count( DISTINCT case when  GroupeMarketingCircuit = 'Tours & Circuits' then   NumeroDossier end ) as Tours_Circuit,
-count( DISTINCT case when  GroupeMarketingCircuit = 'SENSATIONNEL' then   NumeroDossier end ) as SENSATIONNEL
-FROM {{ source('bq_data', 'datamart_V_032022') }} 
-where DateRetour >= DateDepart
-group by Destination)
+with data as (
+    select
+        destination,
+        count(
+            distinct case
+                when statutreservation = 'Ferme' then numerodossier
+            end
+        ) as total_dossier_ferme,
+        count(
+            distinct case when canalregroupe = 'TO Prod.' then numerodossier end
+        ) as to_prod,
+        count(
+            distinct case
+                when canalregroupe = ' Group & Collect.' then numerodossier
+            end
+        ) as group_collect,
+        count(
+            distinct case
+                when canalregroupe = 'Franchised' then numerodossier
+            end
+        ) as franchised,
+        count(
+            distinct case when canalregroupe = 'Internet' then numerodossier end
+        ) as internet,
+        count(distinct case when canalregroupe = 'Owned' then numerodossier end)
+            as owned,
+        count(
+            distinct case
+                when canalregroupe = 'Third Party' then numerodossier
+            end
+        ) as third_party,
+        count(
+            distinct case
+                when canalregroupe = 'Call Center' then numerodossier
+            end
+        ) as call_center,
+        count(
+            distinct case
+                when canalregroupe = 'Non Renseigné' then numerodossier
+            end
+        ) as non_renseigne,
+        count(distinct case when id_email_md5 is null then numerodossier end)
+            as clients_non_identifies,
+        count(
+            distinct case when id_email_md5 is not null then numerodossier end
+        )
+            as clients_identifies,
+        round(
+            safe_divide(
+                sum(safe_cast(cabrut as FLOAT64)), count(distinct numerodossier)
+            ),
+            2
+        ) as panier_moy,
+        round(
+            avg(
+                date_diff(
+                    cast(datedepart as Date), cast(datereservation as Date), day
+                )
+            ),
+            2
+        ) as delai_achat,
+        round(
+            avg(
+                date_diff(
+                    cast(dateretour as Date), cast(datedepart as Date), day
+                )
+            ),
+            2
+        ) as moy_dure_sejour,
+        count(
+            distinct case
+                when typeproduit = 'Sejour Balneaire' then numerodossier
+            end
+        ) as sejour_balneaire,
+        count(distinct case when typeproduit = 'Circuit' then numerodossier end)
+            as circuit,
+        count(
+            distinct case when typeproduit = 'Vols secs' then numerodossier end
+        )
+            as vols_secs,
+        count(
+            distinct case
+                when typeproduit = 'Sejour_Neige' then numerodossier
+            end
+        ) as sejour_neige,
+        count(
+            distinct case
+                when typeproduit = 'Sejour Ville' then numerodossier
+            end
+        ) as sejour_ville,
+        count(
+            distinct case
+                when typeproduit = 'Sejour Nature' then numerodossier
+            end
+        ) as sejour_nature,
+        count(
+            distinct case when typeproduit = 'Autotour' then numerodossier end
+        )
+            as autotour,
+        count(
+            distinct case when typeproduit = 'Croisiere' then numerodossier end
+        )
+            as croisiere,
+        round(avg(nbrclients), 2) as pax_moy,
+        round(
+            sum(nbradultes) / sum(case when nbrenfants > 0 then nbrenfants end),
+            2
+        ) as ratio_adultes_enfants,
+        count(
+            distinct case
+                when groupemarketingcircuit = 'Decouvrir' then numerodossier
+            end
+        ) as decourir,
+        count(
+            distinct case
+                when groupemarketingcircuit = 'CONNAISSEUR' then numerodossier
+            end
+        ) as connaisseur,
+        count(
+            distinct case
+                when groupemarketingcircuit = 'APPROFONDIR' then numerodossier
+            end
+        ) as approfondir,
+        count(
+            distinct case
+                when groupemarketingcircuit = 'ESSENTIEL' then numerodossier
+            end
+        ) as essentiel,
+        count(
+            distinct case
+                when
+                    groupemarketingcircuit = 'Séjours Activités'
+                    then numerodossier
+            end
+        ) as sejours_activites,
+        count(
+            distinct case
+                when
+                    groupemarketingcircuit = 'GRANDEUR NATURE'
+                    then numerodossier
+            end
+        ) as grandeur_nature,
+        count(
+            distinct case
+                when groupemarketingcircuit = 'RENCONTRER' then numerodossier
+            end
+        ) as rencontrer,
+        count(
+            distinct case
+                when groupemarketingcircuit = 'ESTHETE' then numerodossier
+            end
+        ) as esthete,
+        count(
+            distinct case
+                when groupemarketingcircuit = 'HOTELS AUTRES' then numerodossier
+            end
+        ) as hotels_autres,
+        count(
+            distinct case
+                when groupemarketingcircuit = 'Lookéa' then numerodossier
+            end
+        ) as lookea,
+        count(
+            distinct case
+                when
+                    groupemarketingcircuit = 'Tours & Circuits'
+                    then numerodossier
+            end
+        ) as tours_circuit,
+        count(
+            distinct case
+                when groupemarketingcircuit = 'SENSATIONNEL' then numerodossier
+            end
+        ) as sensationnel
+    from {{ source('bq_data', 'datamart_V_032022') }}
+    where dateretour >= datedepart
+    group by destination
+)
 
-select Destination,
-total_dossier_ferme,
-To_prod,
-Group_collect,
-Franchised,
-Internet,
-Owned,
-Third_party,
-Call_center, 
-Non_renseigne,
-clients_non_identifies,
-clients_identifies, 
-panier_moy,
-delai_achat,
-moy_dure_sejour,
-Sejour_Balneaire,
-Circuit,
-Vols_secs,
-Sejour_Neige,
-Sejour_Ville,
-Sejour_Nature,
-Autotour,
-Croisiere,
-pax_moy,
-ratio_Adultes_enfants,
-Decourir,CONNAISSEUR,
-APPROFONDIR,ESSENTIEl, 
-Sejours_Activites,
-GRANDEUR_NATURE,
-RENCONTRER,ESTHETE,
-HOTELS_Autres,Lookea,
-Tours_Circuit,SENSATIONNEL,
+select
+    destination,
+    total_dossier_ferme,
+    to_prod,
+    group_collect,
+    franchised,
+    internet,
+    owned,
+    third_party,
+    call_center,
+    non_renseigne,
+    clients_non_identifies,
+    clients_identifies,
+    panier_moy,
+    delai_achat,
+    moy_dure_sejour,
+    sejour_balneaire,
+    circuit,
+    vols_secs,
+    sejour_neige,
+    sejour_ville,
+    sejour_nature,
+    autotour,
+    croisiere,
+    pax_moy,
+    ratio_adultes_enfants,
+    decourir,
+    connaisseur,
+    approfondir,
+    essentiel,
+    sejours_activites,
+    grandeur_nature,
+    rencontrer,
+    esthete,
+    hotels_autres,
+    lookea,
+    tours_circuit,
+    sensationnel
 from data

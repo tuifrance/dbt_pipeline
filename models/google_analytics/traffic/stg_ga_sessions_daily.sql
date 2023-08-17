@@ -310,11 +310,11 @@ select distinct
     ) as step4_erreur,
     round(sum(h.transaction.transactionrevenue / 1000000), 2) as revenue
 
-from {{ source('ga_tui_fr', 'ga_sessions_*') }} as ga, 
-        date_range, 
-        unnest(ga.hits) as h
-        where _table_suffix between start_date and end_date and  totals.visits = 1
-        group by 1, 2, 3, 4, 5, 6, 7, 8,9, 10
+from {{ source('ga_tui_fr', 'ga_sessions_*') }},
+    date_range,
+    unnest(ga.hits) as h
+where _table_suffix between start_date and end_date and totals.visits = 1
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
 /*
 select *
